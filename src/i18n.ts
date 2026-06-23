@@ -151,6 +151,7 @@ type UITranslations = {
     h1: string;
     lede: string;
     lastUpdatedPrefix: string;
+    citation: { quote: string; attribution: string };
     h2a: string;
     h2b: string;
     h2c: string;
@@ -289,28 +290,31 @@ export const ui: Record<Locale, UITranslations> = {
   },
   now: {
     title: 'Now',
-    description: 'What {name} is leading, learning, and researching right now.',
+    description: 'What {name} is building, learning, and preparing for right now.',
     h1: "What I'm focused on this season.",
-    lede:
-      'A snapshot of what I\'m leading, learning, and researching right now. Inspired by <a href="https://nownownow.com/about" rel="noopener">nownownow</a> — these pages should be short, honest, and updated every few months.',
+    lede: "A snapshot of what I'm leading, learning, and researching right now.",
     lastUpdatedPrefix: 'Last updated:',
-    h2a: 'Leading',
-    h2b: 'Learning',
-    h2c: 'Researching',
+    citation: {
+      quote: "A /now page shares what you'd tell a friend you hadn't seen in a year.",
+      attribution: 'Derek Sivers, nownownow.com',
+    },
+    h2a: 'Shipping at work',
+    h2b: 'Getting sharper',
+    h2c: 'Cooking next',
     learning: [
-      'Leading a team of three: code reviews, mentoring, and architecture review at Grupo Distelsa.',
-      'Refining technical standards for distributed services with REST and RabbitMQ.',
-      'Coordinating with QA, infrastructure, and the business to keep delivery boring.',
+      'Focused on moving a complex, ambitious project forward with my current employer.',
+      'Balancing delivery, technical decisions, and the discipline required to keep a large effort understandable as it grows.',
+      'Staying close to the code while helping the team keep momentum, quality, and business context aligned.',
     ],
     building: [
-      'Distributed services for internal quoting, credit, and insurance provider integration.',
-      'ETM data capture from POS systems.',
-      'Maintenance and refactoring of long-lived .NET / C# services backed by Oracle and PL/SQL.',
+      'Improving my English so I can communicate better across teams, documentation, and technical conversations.',
+      'Deepening hard skills around microservices, DDD, TDD, clean architecture, event programming, and event-driven architecture.',
+      'Preparing to start learning AWS as the next step in my backend and architecture path.',
     ],
     researching: [
-      'Where modular design ends and platform boundaries begin in mid-size enterprise systems.',
-      'How to keep synchronous and asynchronous communication legible as systems grow.',
-      'How to make code review scale without losing the mentoring it provides.',
+      'A personal project that is still cooking: a SaaS idea for a specific niche with a real, painful problem to solve.',
+      'Keeping the first version intentionally small so the product can validate value before growing in complexity.',
+      'Looking for the point where technical craft, business need, and a focused market can meet.',
     ],
   },
   projects: {
@@ -449,28 +453,32 @@ export const ui: Record<Locale, UITranslations> = {
   },
   now: {
     title: 'Ahora',
-    description: 'Qué está liderando, aprendiendo e investigando {name} en este momento.',
+    description: 'Qué está construyendo, aprendiendo y preparando {name} en este momento.',
     h1: 'En qué estoy enfocado esta temporada.',
-    lede:
-      'Una instantánea de qué estoy liderando, aprendiendo e investigando ahora mismo. Inspirado por <a href="https://nownownow.com/about" rel="noopener">nownownow</a> — estas páginas deben ser cortas, honestas y actualizadas cada pocos meses.',
+    lede: 'Una instantánea de qué estoy liderando, aprendiendo e investigando ahora mismo.',
     lastUpdatedPrefix: 'Última actualización:',
-    h2a: 'Liderando',
-    h2b: 'Aprendiendo',
-    h2c: 'Investigando',
+    citation: {
+      quote:
+        'Una página /now comparte lo que le contarías a un amigo que no has visto en un año.',
+      attribution: 'Derek Sivers, nownownow.com (traducción)',
+    },
+    h2a: 'Sacando adelante en el trabajo',
+    h2b: 'Puliendo habilidades',
+    h2c: 'Cocinando lo próximo',
     learning: [
-      'Liderando un equipo de tres: code reviews, mentoring y revisión de arquitectura en Grupo Distelsa.',
-      'Refinando estándares técnicos para servicios distribuidos con REST y RabbitMQ.',
-      'Coordinando con QA, infraestructura y el negocio para que la entrega siga siendo aburrida.',
+      'Enfocado en sacar adelante un proyecto complejo y ambicioso con mi empleador actual.',
+      'Balanceando entrega, decisiones técnicas y la disciplina necesaria para mantener entendible un esfuerzo grande a medida que crece.',
+      'Manteniéndome cerca del código mientras ayudo al equipo a sostener momentum, calidad y contexto de negocio.',
     ],
     building: [
-      'Servicios distribuidos para cotización interna, crédito e integración con proveedores de seguros.',
-      'Captura de datos ETM desde puntos de venta.',
-      'Mantenimiento y refactor de servicios .NET / C# de larga vida sobre Oracle y PL/SQL.',
+      'Mejorando mi inglés para comunicarme mejor con equipos, documentación y conversaciones técnicas.',
+      'Profundizando habilidades duras en microservicios, DDD, TDD, clean architecture, event programming y arquitectura orientada a eventos.',
+      'Preparándome para empezar a aprender AWS como siguiente paso en mi camino de backend y arquitectura.',
     ],
     researching: [
-      'Dónde termina el diseño modular y empiezan los límites de plataforma en sistemas empresariales medianos.',
-      'Cómo mantener legible la comunicación síncrona y asíncrona a medida que los sistemas crecen.',
-      'Cómo hacer que el code review escale sin perder el mentoring que aporta.',
+      'Un proyecto personal que todavía se está cocinando: una idea SaaS para un nicho específico con un problema real que resolver.',
+      'Manteniendo la primera versión intencionalmente pequeña para validar valor antes de hacer crecer la complejidad.',
+      'Buscando el punto donde oficio técnico, necesidad de negocio y un mercado enfocado se encuentran.',
     ],
   },
   projects: {

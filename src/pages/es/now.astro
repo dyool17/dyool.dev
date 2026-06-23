@@ -15,9 +15,20 @@ const description = strings.description.replace('{name}', SITE.author);
       <h1 class="serif">{strings.h1}</h1>
       <p class="lede" set:html={strings.lede}></p>
       <p class="updated muted mono">
-        {strings.lastUpdatedPrefix} <time datetime="2026-06-01">1 de junio de 2026</time>
+        {strings.lastUpdatedPrefix} <time datetime="2026-06-22">22 de junio de 2026</time>
       </p>
     </header>
+
+    <blockquote class="now-cite">
+      <p>{strings.citation.quote}</p>
+      <p class="mono muted">
+        — <cite
+          ><a href="https://nownownow.com/about" rel="noopener"
+            >{strings.citation.attribution}</a
+          ></cite
+        >
+      </p>
+    </blockquote>
 
     <h2>{strings.h2a}</h2>
     <ul>
@@ -41,5 +52,21 @@ const description = strings.description.replace('{name}', SITE.author);
     font-size: 0.85rem;
     margin-top: 1rem;
     color: var(--text-soft);
+  }
+
+  .now-cite {
+    margin: 1.5em 0 2rem;
+    font-size: 0.98rem;
+  }
+  .now-cite p {
+    margin: 0;
+  }
+  .now-cite p + p {
+    margin-top: 0.55rem;
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+  }
+  .now-cite cite {
+    font-style: normal;
   }
 </style>
