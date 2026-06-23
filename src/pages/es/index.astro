@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import HomeBody from '../../components/home/HomeBody.astro';
+import { SITE } from '../../consts';
+import { getLocaleFromPath } from '../../i18n';
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+---
+
+<BaseLayout
+  title="Inicio"
+  description={SITE.description}
+  canonicalPath={Astro.url.pathname}
+  locale={locale}
+>
+  <HomeBody locale={locale} />
+</BaseLayout>

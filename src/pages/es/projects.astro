@@ -1,0 +1,239 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SITE } from '../../consts';
+import { t, getLocaleFromPath } from '../../i18n';
+import { getExperience, formatRange } from '../../data/experience';
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+const strings = t(locale).projects;
+const lede = strings.lede.replace('{linkedin}', SITE.linkedin);
+
+const entries = getExperience(locale);
+---
+
+<BaseLayout title={strings.title} description={strings.description} locale={locale}>
+  <header class="page-header" data-reveal>
+    <p class="kicker mono">{strings.title}</p>
+    <h1 class="serif">{strings.h1}</h1>
+    <p class="lede" set:html={lede}></p>
+  </header>
+
+  <ul class="project-list">
+    {
+      entries.map((entry) => (
+        <li id={entry.id} class="project" data-reveal>
+          <header class="project-head">
+            <div>
+              <h2>
+                {entry.role}
+                <span class="project-company"> · {entry.company}</span>
+              </h2>
+              <p class="summary">{entry.summary}</p>
+              <p class="project-location mono">{entry.location}</p>
+            </div>
+            <p class="project-date">
+              <time
+                datetime={
+                  entry.endYear
+                    ? `${entry.endYear}-${String(entry.endMonth ?? 12).padStart(2, '0')}`
+                    : `${entry.startYear}-${String(entry.startMonth).padStart(2, '0')}`
+                }
+              >
+                {formatRange(
+                  { month: entry.startMonth, year: entry.startYear },
+                  entry.endMonth && entry.endYear
+                    ? { month: entry.endMonth, year: entry.endYear }
+                    : null,
+                  locale,
+                )}
+              </time>
+              {entry.featured && <span class="badge">{strings.featured}</span>}
+            </p>
+          </header>
+
+          <dl class="meta-grid">
+            <div>
+              <dt>{strings.solution}</dt>
+              <dd>{entry.focus}</dd>
+            </div>
+            <div>
+              <dt>{strings.problem}</dt>
+              <dd>{entry.role}</dd>
+            </div>
+            <div class="meta-full">
+              <dt>{strings.lessons}</dt>
+              <dd>
+                <ul class="lessons">
+                  {entry.highlights.map((h) => (
+                    <li>{h}</li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+            <div class="meta-full">
+              <dt>{strings.stack}</dt>
+              <dd>
+                <ul class="tag-list">
+                  {entry.stack.map((t) => (
+                    <li class="tag">{t}</li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          </dl>
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>
+
+<style>
+  .project-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .project {
+    padding: clamp(1.6rem, 3vw, 2.2rem);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    transition:
+      border-color var(--dur) var(--ease-out),
+      box-shadow var(--dur) var(--ease-out),
+      transform var(--dur) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .project:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+  }
+
+  .project-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .project-head h2 {
+    margin: 0 0 0.5rem;
+    font-size: clamp(1.3rem, 2.4vw, 1.6rem);
+    font-weight: 550;
+    letter-spacing: -0.022em;
+  }
+
+  .project-company {
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .project-location {
+    margin: 0.35rem 0 0;
+    font-size: 0.78rem;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .project-date {
+    font-size: 0.85rem;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--text-soft);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.2em 0.7em;
+    border-radius: 999px;
+    background: var(--text);
+    color: var(--text-on-inverse);
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    line-height: 1.6;
+  }
+
+  .summary {
+    font-size: 1.05rem;
+    line-height: 1.5;
+    margin: 0;
+    color: var(--text-muted);
+    max-width: 38em;
+  }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.1rem 1.5rem;
+    margin: 0;
+  }
+
+  @media (min-width: 720px) {
+    .meta-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .meta-full {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .meta-grid > div {
+    margin: 0;
+  }
+
+  dt {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-soft);
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--text);
+    line-height: 1.55;
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .tag-list .tag {
+    margin: 0;
+  }
+
+  .lessons {
+    margin: 0;
+    padding-left: 1.2em;
+  }
+
+  .lessons li + li {
+    margin-top: 0.35em;
+  }
+</style>

@@ -1,0 +1,172 @@
+---
+// Tiny, dependency-free theme toggle. The inline script below applies the
+// dark class on <html> early enough to avoid a flash of light theme. The
+// icon swap uses opacity/transform so it never reflows.
+---
+
+<button
+  type="button"
+  class="theme-toggle"
+  aria-label="Switch to dark mode"
+  aria-pressed="false"
+  title="Toggle theme"
+  data-theme-toggle
+>
+  <span class="track" aria-hidden="true">
+    <span class="thumb">
+      <svg class="icon-sun" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">
+        <circle cx="12" cy="12" r="3.6" fill="currentColor"></circle>
+        <g stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+          <line x1="12" y1="2.6" x2="12" y2="4.4"></line>
+          <line x1="12" y1="19.6" x2="12" y2="21.4"></line>
+          <line x1="2.6" y1="12" x2="4.4" y2="12"></line>
+          <line x1="19.6" y1="12" x2="21.4" y2="12"></line>
+          <line x1="5.1" y1="5.1" x2="6.4" y2="6.4"></line>
+          <line x1="17.6" y1="17.6" x2="18.9" y2="18.9"></line>
+          <line x1="5.1" y1="18.9" x2="6.4" y2="17.6"></line>
+          <line x1="17.6" y1="6.4" x2="18.9" y2="5.1"></line>
+        </g>
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M20.5 14.2A8 8 0 0 1 9.8 3.5a.6.6 0 0 0-.8-.7 9.5 9.5 0 1 0 12.2 12.2.6.6 0 0 0-.7-.8Z"
+        ></path>
+      </svg>
+    </span>
+  </span>
+</button>
+
+<style>
+  .theme-toggle {
+    /* Reset */
+    appearance: none;
+    -webkit-appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 999px;
+  }
+
+  /* Track is a 36×20 pill, with a 16px thumb that slides between two slots. */
+  .track {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 2.4rem;
+    height: 1.3rem;
+    border-radius: 999px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    box-shadow: inset 0 1px 2px rgba(14, 15, 18, 0.06);
+    transition:
+      background var(--dur) var(--ease-out),
+      border-color var(--dur) var(--ease-out);
+  }
+
+  .thumb {
+    position: absolute;
+    top: 50%;
+    left: 2px;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: var(--text);
+    color: var(--bg);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+    transition:
+      transform var(--dur) var(--ease-out),
+      background var(--dur) var(--ease-out);
+  }
+
+  /* Default (light): thumb on the LEFT, sun visible. */
+  .icon-sun,
+  .icon-moon {
+    position: absolute;
+    transition:
+      opacity var(--dur-fast) var(--ease-out),
+      transform var(--dur) var(--ease-out);
+  }
+
+  :root:not(.dark) .icon-sun {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+  :root:not(.dark) .icon-moon {
+    opacity: 0;
+    transform: scale(0.6) rotate(-30deg);
+  }
+  :root:not(.dark) .thumb {
+    transform: translate(0, -50%);
+  }
+
+  /* Dark: thumb on the RIGHT, moon visible. */
+  :root.dark .icon-sun {
+    opacity: 0;
+    transform: scale(0.6) rotate(30deg);
+  }
+  :root.dark .icon-moon {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+  :root.dark .thumb {
+    transform: translate(calc(2.4rem - 1rem - 2px), -50%);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .theme-toggle:hover .track {
+      border-color: var(--border-strong);
+    }
+    .theme-toggle:hover .thumb {
+      background: var(--accent);
+    }
+    .theme-toggle:active .track {
+      transform: scale(0.97);
+    }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const STORAGE_KEY = 'theme';
+    const root = document.documentElement;
+    const syncAria = (theme) => {
+      for (const btn of document.querySelectorAll('[data-theme-toggle]')) {
+        const isDark = theme === 'dark';
+        btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+        btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+      }
+    };
+    const apply = (theme) => {
+      if (theme === 'dark') root.classList.add('dark');
+      else root.classList.remove('dark');
+      syncAria(theme);
+    };
+    const stored = localStorage.getItem(STORAGE_KEY);
+    const prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
+    apply(stored ?? (prefersDark ? 'dark' : 'light'));
+
+    for (const btn of document.querySelectorAll('[data-theme-toggle]')) {
+      btn.addEventListener('click', () => {
+        const next = root.classList.contains('dark') ? 'light' : 'dark';
+        apply(next);
+        localStorage.setItem(STORAGE_KEY, next);
+      });
+    }
+  })();
+</script>

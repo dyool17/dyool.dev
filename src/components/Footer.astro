@@ -1,0 +1,224 @@
+---
+import { SITE, SOCIAL } from '../consts';
+import { t, localizePath, type Locale } from '../i18n';
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'en' } = Astro.props as Props;
+const strings = t(locale);
+const year = new Date().getFullYear();
+
+// Map social label to a tiny inline icon. Falls back to no icon for
+// anything not in the lookup (e.g. RSS).
+const ICONS: Record<string, string> = {
+  LinkedIn:
+    '<path fill="currentColor" d="M20.4 2H3.6C2.7 2 2 2.7 2 3.6v16.8c0 .9.7 1.6 1.6 1.6h16.8c.9 0 1.6-.7 1.6-1.6V3.6C22 2.7 21.3 2 20.4 2zM8.3 18.3H5.3V9.7h3v8.6zM6.8 8.4c-1 0-1.8-.8-1.8-1.8s.8-1.7 1.8-1.7 1.8.8 1.8 1.8-.8 1.7-1.8 1.7zm11.5 9.9h-3v-4.2c0-1 0-2.3-1.4-2.3-1.4 0-1.6 1.1-1.6 2.2v4.3h-3V9.7h2.9v1.2c.4-.8 1.4-1.6 2.9-1.6 3.1 0 3.7 2 3.7 4.7v4.3z"/>',
+  RSS: '<path fill="currentColor" d="M4 4v3a13 13 0 0 1 13 13h3A16 16 0 0 0 4 4zm0 6v3a7 7 0 0 1 7 7h3a10 10 0 0 0-10-10zm2 7a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>',
+};
+
+const socials = SOCIAL.map((s) => {
+  if (s.label !== 'RSS') return s;
+  // RSS link is locale-aware so the feed matches the language the user is
+  // currently reading.
+  return { ...s, href: localizePath('/rss.xml', locale) };
+});
+
+const socialsLabel = locale === 'es' ? 'Enlaces sociales' : 'Social links';
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="identity">
+      <p class="brand-line">
+        <span class="serif name">Dylan Yool</span>
+        <span class="dot" aria-hidden="true">·</span>
+        <span class="role">{SITE.jobTitle}</span>
+      </p>
+      <p class="copy muted">
+        &copy; {year}. {strings.footer.builtWith}
+        <a href="https://astro.build" rel="noopener">Astro</a>. {strings.footer.deployedOn}
+        <a href="https://pages.github.com" rel="noopener">GitHub Pages</a>.
+      </p>
+    </div>
+
+    <ul class="links" aria-label={socialsLabel}>
+      {
+        socials.map((item) => (
+          <li>
+            <a href={item.href} rel="noopener me" aria-label={item.label}>
+              {ICONS[item.label] && (
+                <svg
+                  viewBox="0 0 24 24"
+                  width="15"
+                  height="15"
+                  aria-hidden="true"
+                  set:html={ICONS[item.label]}
+                />
+              )}
+              <span>{item.label}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg-elevated) 60%, transparent);
+    padding: 2.5rem 0 3rem;
+    margin-top: 5rem;
+    position: relative;
+  }
+
+  .site-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--border-strong) 20%,
+      var(--border-strong) 80%,
+      transparent 100%
+    );
+    opacity: 0.5;
+  }
+
+  .wrap {
+    max-width: var(--max-width-wide);
+    margin: 0 auto;
+    padding: 0 var(--content-pad);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem 2rem;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+  }
+
+  @media (min-width: 768px) {
+    .wrap {
+      padding: 0 var(--content-pad-lg);
+    }
+  }
+
+  .identity {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .brand-line {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+
+  .brand-line .name {
+    font-size: 1.15rem;
+    letter-spacing: -0.012em;
+  }
+
+  .brand-line .role {
+    color: var(--text-soft);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .brand-line .dot {
+    color: var(--text-soft);
+  }
+
+  .copy {
+    margin: 0;
+    font-size: 0.85rem;
+  }
+
+  .copy a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--border-strong);
+    text-underline-offset: 3px;
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      text-decoration-color var(--dur-fast) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .copy a:hover {
+      color: var(--accent);
+      text-decoration-color: var(--accent);
+    }
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--text-muted);
+    padding: 0.45rem 0.8rem;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    font-size: 0.9rem;
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      background var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+    text-decoration: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .links a:hover {
+      color: var(--text);
+      background: var(--bg-elevated-2);
+      border-color: var(--border);
+      text-decoration: none;
+    }
+    .links a:active {
+      transform: scale(0.97);
+    }
+  }
+
+  .links a:focus-visible {
+    background: var(--bg-elevated-2);
+    border-color: var(--border);
+  }
+
+  .links svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 520px) {
+    .wrap {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+    }
+  }
+</style>

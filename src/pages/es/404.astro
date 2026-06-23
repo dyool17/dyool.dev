@@ -1,0 +1,86 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t, getLocaleFromPath } from '../../i18n';
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+const strings = t(locale).notFound;
+---
+
+<BaseLayout title={strings.title} description={strings.description} locale={locale}>
+  <article class="prose not-found" data-reveal>
+    <p class="code-line mono">
+      <span class="code-prompt" aria-hidden="true">$</span>
+      <span class="code-cmd">cd /desconocido</span>
+      <span class="code-out muted">— bash: no existe el archivo o directorio</span>
+    </p>
+
+    <h1 class="serif">{strings.h1}</h1>
+
+    <p class="lede">{strings.lead}</p>
+
+    <p class="actions">
+      <a class="btn primary" href="/es/">
+        {strings.home} <span class="arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="btn" href="/es/blog/">{strings.blog}</a>
+      <a class="btn" href="/es/projects/">{strings.projects}</a>
+      <a class="btn ghost" href="/es/about/">{strings.about}</a>
+    </p>
+  </article>
+</BaseLayout>
+
+<style>
+  .not-found {
+    max-width: 60ch;
+  }
+
+  .code-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    font-size: 0.88rem;
+    padding: 0.5rem 0.85rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 0 0 1.5rem;
+  }
+
+  .code-prompt {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .code-cmd {
+    color: var(--text);
+  }
+
+  .code-out {
+    font-size: 0.82rem;
+  }
+
+  .not-found h1.serif {
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    margin: 0 0 0.6em;
+  }
+
+  .not-found .lede {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin: 0 0 1.8rem;
+    max-width: 38em;
+    line-height: 1.55;
+  }
+
+  .not-found .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 0;
+  }
+</style>

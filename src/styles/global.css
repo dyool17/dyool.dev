@@ -1,0 +1,884 @@
+/* =============================================================================
+   Design tokens — light theme
+   Premium editorial personal brand. The "ink" palette keeps the page feeling
+   grounded and serious, while a single warm radial in the hero adds atmosphere
+   without falling into generic AI-gradient territory.
+   ========================================================================== */
+
+:root {
+  /* Surfaces */
+  --bg: #f6f5f1;
+  --bg-elevated: #fbfaf6;
+  --bg-elevated-2: #ffffff;
+  --bg-inverse: #0e0f12;
+
+  /* Text */
+  --text: #0e0f12;
+  --text-muted: #4a4f5a;
+  --text-soft: #6b7180;
+  --text-on-accent: #ffffff;
+  --text-on-inverse: #f6f5f1;
+
+  /* Accent — a single, confident blue. Not neon, not purple. */
+  --accent: #2a4ad7;
+  --accent-hover: #1e3ab8;
+  --accent-soft: rgba(42, 74, 215, 0.08);
+  --accent-soft-2: rgba(42, 74, 215, 0.14);
+
+  /* Lines */
+  --border: #e5e1d8;
+  --border-strong: #cfc9bb;
+  --hairline: rgba(14, 15, 18, 0.08);
+
+  /* Code */
+  --code-bg: #1a1c20;
+  --code-text: #e7e5df;
+
+  /* Selection */
+  --selection-bg: rgba(42, 74, 215, 0.18);
+
+  /* Shadows — restrained. Premium feels grounded, not floaty. */
+  --shadow-sm: 0 1px 0 rgba(14, 15, 18, 0.04), 0 1px 2px rgba(14, 15, 18, 0.04);
+  --shadow-md: 0 2px 4px -2px rgba(14, 15, 18, 0.08), 0 4px 12px -4px rgba(14, 15, 18, 0.08);
+  --shadow-lg: 0 12px 32px -12px rgba(14, 15, 18, 0.18), 0 4px 12px -4px rgba(14, 15, 18, 0.08);
+  --shadow-glow: 0 0 0 1px rgba(42, 74, 215, 0.18), 0 8px 24px -8px rgba(42, 74, 215, 0.22);
+
+  /* Atmosphere — the hero sits over a soft, single-hue radial. Quiet, not loud. */
+  --atmosphere-1: rgba(42, 74, 215, 0.08);
+  --atmosphere-2: rgba(208, 184, 116, 0.05);
+
+  /* Typography */
+  --font-sans:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+  --font-serif:
+    'Instrument Serif', 'Iowan Old Style', 'Apple Garamond', Baskerville, 'Times New Roman',
+    Georgia, serif;
+  --font-mono:
+    'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Geometry */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 22px;
+
+  /* Layout */
+  --max-width: 70ch;
+  --max-width-wide: 78rem;
+  --content-pad: 1.25rem;
+  --content-pad-lg: 2.5rem;
+
+  /* Motion — Emil-style: custom curves, never `transition: all`, never ease-in. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --dur-fast: 140ms;
+  --dur: 200ms;
+  --dur-slow: 320ms;
+}
+
+/* =============================================================================
+   Dark theme
+   Deep ink — not a generic slate. Warmer than a true black, with a very faint
+   blue undertone. Borders are intentionally lifted so dark-mode cards still
+   read as cards, not voids.
+   ========================================================================== */
+
+:root.dark {
+  --bg: #0a0c10;
+  --bg-elevated: #11141a;
+  --bg-elevated-2: #171b23;
+  --bg-inverse: #f6f5f1;
+
+  --text: #ecebe5;
+  --text-muted: #9ba2b1;
+  --text-soft: #6f7686;
+  --text-on-accent: #0a0c10;
+  --text-on-inverse: #0a0c10;
+
+  --accent: #8aa6ff;
+  --accent-hover: #a8beff;
+  --accent-soft: rgba(138, 166, 255, 0.12);
+  --accent-soft-2: rgba(138, 166, 255, 0.2);
+
+  --border: #1f242d;
+  --border-strong: #2c323d;
+  --hairline: rgba(236, 235, 229, 0.08);
+
+  --code-bg: #11141a;
+  --code-text: #ecebe5;
+
+  --selection-bg: rgba(138, 166, 255, 0.28);
+
+  --shadow-sm: 0 1px 0 rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 2px 4px -2px rgba(0, 0, 0, 0.5), 0 8px 24px -8px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 16px 48px -16px rgba(0, 0, 0, 0.7), 0 6px 16px -6px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 0 1px rgba(138, 166, 255, 0.28), 0 8px 32px -8px rgba(138, 166, 255, 0.32);
+
+  --atmosphere-1: rgba(138, 166, 255, 0.1);
+  --atmosphere-2: rgba(255, 220, 160, 0.04);
+}
+
+/* =============================================================================
+   Reset + base
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  transition:
+    background-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out);
+  position: relative;
+  isolation: isolate;
+}
+
+/* Atmospheric backdrop — single soft radial + a barely-there grain. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 60% at 50% -10%, var(--atmosphere-1) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 10%, var(--atmosphere-2) 0%, transparent 70%);
+  transition: background var(--dur-slow) var(--ease-out);
+}
+
+/* Subtle grain. SVG noise, ~5% opacity. Adds tactility without distraction. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.45 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/></svg>");
+  background-size: 220px 220px;
+}
+
+:root.dark body::after {
+  mix-blend-mode: screen;
+  opacity: 0.18;
+}
+
+::selection {
+  background: var(--selection-bg);
+  color: var(--text);
+}
+
+/* =============================================================================
+   Layout
+   ========================================================================== */
+
+main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--max-width-wide);
+  margin: 0 auto;
+  padding: 2.5rem var(--content-pad) 5rem;
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  main {
+    padding: 3.5rem var(--content-pad-lg) 6rem;
+  }
+}
+
+/* =============================================================================
+   Typography
+   ========================================================================== */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 0 0 0.6em;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  scroll-margin-top: 5rem;
+}
+
+h1 {
+  font-size: clamp(2.2rem, 5.5vw, 3.6rem);
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  font-weight: 500;
+}
+
+h2 {
+  font-size: clamp(1.45rem, 2.6vw, 1.85rem);
+  margin-top: 2em;
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+  font-weight: 550;
+}
+
+h3 {
+  font-size: 1.2rem;
+  margin-top: 1.6em;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+p,
+ul,
+ol {
+  margin: 0 0 1.1em;
+}
+
+ul,
+ol {
+  padding-left: 1.4em;
+}
+
+li + li {
+  margin-top: 0.25em;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 2.5em 0;
+}
+
+blockquote {
+  margin: 1.5em 0;
+  padding: 0.6em 1.2em;
+  border-left: 3px solid var(--accent);
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 0.15em 0.45em;
+  border-radius: 5px;
+  word-break: break-word;
+  border: 1px solid var(--border);
+}
+
+pre {
+  font-family: var(--font-mono);
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 1rem 1.15rem;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  border: 1px solid var(--border);
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+  border: 0;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  font-size: 0.95em;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.6em 0.8em;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  font-weight: 600;
+  background: var(--bg-elevated);
+}
+
+/* =============================================================================
+   Links — exact-property transitions, custom easing.
+   ========================================================================== */
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    text-decoration-color var(--dur-fast) var(--ease-out);
+}
+
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1.5px;
+}
+
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* =============================================================================
+   Utilities
+   ========================================================================== */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.6rem 1rem;
+  background: var(--accent);
+  color: var(--text-on-accent);
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.92rem;
+  transform: translateY(-200%);
+  transition: transform var(--dur) var(--ease-out);
+  box-shadow: var(--shadow-md);
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  color: var(--text-on-accent);
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.prose {
+  max-width: var(--max-width);
+}
+
+.prose h2:first-child,
+.prose h3:first-child {
+  margin-top: 0;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.serif {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-feature-settings: 'tnum', 'zero';
+}
+
+/* Section/eyebrow label that sits above an h1. Used on /about, /now, /projects,
+   /blog. The home page overrides this in its scoped styles for the hero kicker
+   (with a status dot) and the connect-card. */
+.kicker {
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-soft);
+  margin: 0 0 1rem;
+}
+
+/* =============================================================================
+   Buttons
+   Press feedback uses scale(0.97) on :active with a custom ease-out.
+   Hover state is gated behind a fine pointer + hover media query so it never
+   sticks on touch devices.
+   ========================================================================== */
+
+.btn {
+  --btn-bg: var(--bg-elevated-2);
+  --btn-fg: var(--text);
+  --btn-border: var(--border);
+  --btn-shadow: var(--shadow-sm);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.1rem;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.005em;
+  color: var(--btn-fg);
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
+  border-radius: 999px;
+  box-shadow: var(--btn-shadow);
+  text-decoration: none;
+  cursor: pointer;
+  transform: translateZ(0);
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Hover-dependent decorations are gated behind a fine pointer so taps on
+   touch devices never leave a sticky hover state. */
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    text-decoration: none;
+    color: var(--text);
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn.primary:hover {
+    --btn-bg: var(--accent);
+    --btn-fg: var(--text-on-accent);
+    --btn-border: var(--accent);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .btn.ghost:hover {
+    --btn-bg: var(--bg-elevated);
+    --btn-shadow: var(--shadow-sm);
+  }
+
+  .btn:hover .arrow {
+    transform: translateX(2px);
+  }
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.btn.primary {
+  --btn-bg: var(--text);
+  --btn-fg: var(--text-on-inverse);
+  --btn-border: var(--text);
+  --btn-shadow: var(--shadow-md);
+}
+
+.btn.ghost {
+  --btn-bg: transparent;
+  --btn-shadow: none;
+}
+
+.btn .arrow {
+  display: inline-block;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+/* On touch devices, suppress the press scale so taps feel honest. */
+@media (hover: none) {
+  .btn:active {
+    transform: none;
+  }
+}
+
+/* =============================================================================
+   Section header — consistent rhythm for each major block on the home page.
+   ========================================================================== */
+
+.section {
+  margin-top: clamp(3.5rem, 6vw, 5.5rem);
+}
+
+.section:first-of-type {
+  margin-top: 0;
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.section-head h2 {
+  margin: 0;
+  font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+.section-head .more {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    gap var(--dur-fast) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .section-head .more:hover {
+    color: var(--accent);
+    text-decoration: none;
+    gap: 0.55rem;
+  }
+}
+
+/* =============================================================================
+   Post / project row list (used on home, blog index)
+   A small chevron sits on the right; the whole row hovers as one surface.
+   ========================================================================== */
+
+.post-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid var(--border);
+}
+
+.post-list--flush {
+  margin-top: 0;
+  border-top: 0;
+}
+
+.post-link {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto auto;
+  column-gap: 1rem;
+  row-gap: 0.3rem;
+  padding: 1.2rem 2.4rem 1.2rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    padding-left var(--dur) var(--ease-out);
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.post-list--with-tags .post-link {
+  padding: 1.3rem 2.6rem 1.3rem 0.65rem;
+}
+
+.post-link::after {
+  content: '\2192';
+  position: absolute;
+  right: 0.7rem;
+  top: 1.3rem;
+  color: var(--text-soft);
+  font-size: 1.05rem;
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur) var(--ease-out);
+}
+
+.post-list--with-tags .post-link::after {
+  right: 0.85rem;
+  top: 1.4rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .post-link:hover {
+    background: var(--bg-elevated);
+    padding-left: 0.85rem;
+    text-decoration: none;
+  }
+  .post-list--with-tags .post-link:hover {
+    padding-left: 1rem;
+  }
+  .post-link:hover::after {
+    color: var(--accent);
+    transform: translateX(3px);
+  }
+}
+
+.post-link:focus-visible {
+  background: var(--bg-elevated);
+  text-decoration: none;
+}
+
+.post-title {
+  grid-column: 1;
+  grid-row: 1;
+  font-weight: 600;
+  font-size: 1.08rem;
+  letter-spacing: -0.012em;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .post-link:hover .post-title,
+  .post-link:focus-visible .post-title {
+    color: var(--accent);
+  }
+}
+
+.post-meta,
+.post-date {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: 0.85rem;
+  align-self: center;
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.post-desc {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  font-size: 0.96rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.post-tags {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.3rem;
+}
+
+@media (max-width: 560px) {
+  .post-link {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+    padding: 1rem 2rem 1rem 0.55rem;
+  }
+  .post-list--with-tags .post-link {
+    padding: 1.1rem 2rem 1.1rem 0.65rem;
+  }
+  .post-meta,
+  .post-date {
+    grid-column: 1;
+    align-self: start;
+  }
+  .post-meta {
+    grid-row: 3;
+  }
+  .post-date {
+    grid-row: 2;
+  }
+  .post-desc {
+    grid-row: 2;
+  }
+  .post-list--with-tags .post-desc {
+    grid-row: 3;
+  }
+  .post-tags {
+    grid-row: 4;
+  }
+  .post-link::after {
+    top: 1.15rem;
+  }
+}
+
+/* =============================================================================
+   Tag
+   ========================================================================== */
+
+.tag {
+  display: inline-block;
+  font-size: 0.78rem;
+  padding: 0.2em 0.65em;
+  border-radius: 999px;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  margin-right: 0.4em;
+  margin-bottom: 0.4em;
+  line-height: 1.4;
+  font-family: var(--font-mono);
+  letter-spacing: 0;
+}
+
+/* =============================================================================
+   Page header (used on /about, /blog, /projects, /now)
+   ========================================================================== */
+
+.page-header {
+  margin-bottom: 2.5rem;
+  max-width: 60ch;
+}
+
+.page-header > *:last-child {
+  margin-bottom: 0;
+}
+
+.page-header h1 {
+  margin: 0 0 0.4em;
+}
+
+.page-header .lede {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  max-width: 42em;
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* Editorial page title: italic serif, used by /about, /now, /projects, /blog.
+   Smaller than the hero h1 on the home page. */
+.page-header h1.serif {
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.9rem, 4.2vw, 2.8rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.6em;
+}
+
+/* =============================================================================
+   Surface — elevated card.
+   Press: never. Hover: very subtle lift + border lift. Pressed by an inner
+   button doesn't trigger the surface (we use :not(:has(:active)) via plain
+   border, so it stays predictable).
+   ========================================================================== */
+
+.surface {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out),
+    transform var(--dur) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .surface:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+/* =============================================================================
+   Reveal-on-scroll — soft, tasteful entry for blocks.
+
+   Progressive-enhancement safe: elements are VISIBLE by default. The hidden
+   pre-reveal state only applies once JS has opted in by adding the
+   `reveal-ready` class to <body>. If the script fails to load, runs late,
+   or the user disables JS, every block stays readable. The reveal script in
+   BaseLayout also short-circuits to "shown" for reduced-motion users and
+   when IntersectionObserver is unavailable.
+   ========================================================================== */
+
+[data-reveal] {
+  transition:
+    opacity 600ms var(--ease-out),
+    transform 600ms var(--ease-out);
+}
+
+/* JS opt-in: hide anything that hasn't been revealed yet. */
+body.reveal-ready [data-reveal]:not([data-reveal='shown']) {
+  opacity: 0;
+  transform: translateY(10px);
+  will-change: opacity, transform;
+}
+
+[data-reveal='shown'] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    transition: none;
+  }
+  body.reveal-ready [data-reveal]:not([data-reveal='shown']) {
+    opacity: 1;
+    transform: none;
+    will-change: auto;
+  }
+}

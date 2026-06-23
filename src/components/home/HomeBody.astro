@@ -1,0 +1,788 @@
+---
+import { t, formatDate, type Locale } from '../../i18n';
+import { SITE } from '../../consts';
+import { getExperience, getFeaturedExperience, formatRange } from '../../data/experience';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props as Props;
+const strings = t(locale);
+const home = strings.home;
+
+// Pull the latest 4 published posts in the current locale.
+import { getCollection } from 'astro:content';
+const posts = (
+  await getCollection('blog', ({ data }) => !data.draft && data.lang === locale)
+)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 4);
+
+// Pull the curated experience list. The current role (featured) is shown
+// prominently; the next two entries ride along below the latest writing.
+const experience = getExperience(locale);
+const featured = getFeaturedExperience(locale);
+const restOfExperience = experience.filter((e) => e.id !== featured?.id).slice(0, 2);
+
+// Build URL prefix for the locale (e.g. '' for en, '/es' for es).
+const base = locale === 'en' ? '' : '/es';
+const link = (path: string) => `${base}${path === '/' ? '/' : path}`;
+
+// Numbered symbols for the specialty grid.
+const SYMBOLS = ['01', '02', '03', '04'];
+---
+
+<!-- HERO -->
+<section class="hero" data-reveal>
+  <p class="kicker">
+    <span class="status-dot" aria-hidden="true"></span>
+    <span>{home.kicker}</span>
+  </p>
+
+  <h1 class="hero-title">
+    {home.headline1}<br />
+    {home.headline2Prefix} <em class="serif">{home.headline2Accent}</em><br />
+    <span class="hero-line">{home.headlineLine}</span>
+  </h1>
+
+  <p class="hero-lede" set:html={
+    home.lede
+      .replace('{name}', SITE.shortName)
+      .replace('{jobTitle}', SITE.jobTitle.toLowerCase())
+  }></p>
+
+  <div class="cta-cluster">
+    <a class="btn primary" href={link('/blog/')}>
+      {home.ctaBlog} <span class="arrow" aria-hidden="true">→</span>
+    </a>
+    <a class="btn" href={link('/projects/')}>{home.ctaProjects}</a>
+    <a class="btn ghost" href={link('/about/')}>{home.ctaAbout}</a>
+  </div>
+
+  <div class="hero-strip" aria-label="Profile details">
+    <div class="strip-cell">
+      <span class="strip-label">{home.strip.basedIn}</span>
+      <span class="strip-value">{home.strip.basedInValue}</span>
+    </div>
+    <div class="strip-cell">
+      <span class="strip-label">{home.strip.writingSince}</span>
+      <span class="strip-value mono">{home.strip.writingSinceValue}</span>
+    </div>
+    <div class="strip-cell">
+      <span class="strip-label">{home.strip.stack}</span>
+      <span class="strip-value">{home.strip.stackValue}</span>
+    </div>
+    <div class="strip-cell">
+      <span class="strip-label">{home.strip.currently}</span>
+      <span class="strip-value">
+        <a href={link('/now/')}>{home.strip.currentlyValue}</a>
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- SPECIALTIES -->
+<section class="section" data-reveal>
+  <header class="section-head">
+    <h2>{home.specialtiesHeading}</h2>
+    <a class="more" href={link('/about/')}>
+      {home.specialtiesMore} <span aria-hidden="true">→</span>
+    </a>
+  </header>
+
+  <ul class="specialty-grid">
+    {
+      home.specialties.map((s: { name: string; blurb: string }, i: number) => (
+        <li class="specialty">
+          <span class="specialty-symbol mono" aria-hidden="true">
+            {SYMBOLS[i]}
+          </span>
+          <h3>{s.name}</h3>
+          <p>{s.blurb}</p>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+{
+  featured && (
+    <section class="section" data-reveal>
+      <header class="section-head">
+        <h2>{home.featuredHeading}</h2>
+        <a class="more" href={link('/projects/')}>
+          {home.featuredMore} <span aria-hidden="true">→</span>
+        </a>
+      </header>
+
+      <a class="feature-card" href={`${link('/projects/')}#${featured.id}`}>
+        <div class="feature-meta">
+          <span class="badge">{home.featuredBadge}</span>
+          <span class="feature-date mono">
+            <time datetime={`${featured.startYear}-${String(featured.startMonth).padStart(2, '0')}`}>
+              {formatRange(
+                { month: featured.startMonth, year: featured.startYear },
+                featured.endMonth && featured.endYear
+                  ? { month: featured.endMonth, year: featured.endYear }
+                  : null,
+                locale,
+              )}
+            </time>
+          </span>
+        </div>
+
+        <h3 class="feature-title">
+          {featured.role}
+          <span class="feature-company"> · {featured.company}</span>
+        </h3>
+        <p class="feature-summary">{featured.summary}</p>
+
+        <div class="feature-grid">
+          <div>
+            <span class="feature-label">{home.featuredProblem}</span>
+            <p>{featured.role}</p>
+          </div>
+          <div>
+            <span class="feature-label">{home.featuredSolution}</span>
+            <p>{featured.focus}</p>
+          </div>
+        </div>
+
+        <div class="feature-foot">
+          <ul class="feature-tags" aria-label={home.featuredStack}>
+            {featured.stack.map((t) => (
+              <li class="tag">{t}</li>
+            ))}
+          </ul>
+          <span class="feature-cta">
+            {home.featuredRead}
+            <span class="arrow" aria-hidden="true">
+              →
+            </span>
+          </span>
+        </div>
+      </a>
+    </section>
+  )
+}
+
+<!-- LATEST WRITING -->
+<section class="section" data-reveal>
+  <header class="section-head">
+    <h2>{home.latestHeading}</h2>
+    <a class="more" href={link('/blog/')}>
+      {home.latestMore} <span aria-hidden="true">→</span>
+    </a>
+  </header>
+
+  {
+    posts.length === 0 ? (
+      <p class="muted">{home.noPosts}</p>
+    ) : (
+      <ul class="post-list post-list--flush">
+        {posts.map((post) => (
+          <li>
+            <a class="post-link" href={`${link('/blog/')}${post.id.replace(/^es\//, '')}/`}>
+              <span class="post-title">{post.data.title}</span>
+              <time class="post-date" datetime={post.data.pubDate.toISOString()}>
+                {formatDate(post.data.pubDate, locale)}
+              </time>
+              <span class="post-desc muted">{post.data.description}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</section>
+
+{
+  restOfExperience.length > 0 && (
+    <section class="section" data-reveal>
+      <header class="section-head">
+        <h2>{home.moreWorkHeading}</h2>
+      </header>
+
+      <ul class="project-strip">
+        {restOfExperience.map((p) => (
+          <li>
+            <a class="project-strip-card" href={`${link('/projects/')}#${p.id}`}>
+              <span class="project-strip-meta mono">
+                <time datetime={`${p.startYear}-${String(p.startMonth).padStart(2, '0')}`}>
+                  {formatRange(
+                    { month: p.startMonth, year: p.startYear },
+                    p.endMonth && p.endYear
+                      ? { month: p.endMonth, year: p.endYear }
+                      : null,
+                    locale,
+                  )}
+                </time>
+              </span>
+              <h4>
+                {p.role}
+                <span class="project-strip-company"> · {p.company}</span>
+              </h4>
+              <p class="muted">{p.summary}</p>
+              <span class="project-strip-arrow" aria-hidden="true">
+                →
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<!-- CONNECT -->
+<section class="section connect" data-reveal>
+  <div class="connect-card">
+    <p class="kicker">{home.connectKicker}</p>
+    <h2 class="serif">{home.connectTitle}</h2>
+    <p class="muted">{home.connectLede}</p>
+    <div class="cta-cluster">
+      <a class="btn primary" href={SITE.linkedin} rel="me noopener">
+        {home.connectLinkedin}
+        <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ---------- HERO ---------- */
+
+  .hero {
+    padding: 2rem 0 1rem;
+    position: relative;
+  }
+
+  .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-soft);
+    margin: 0 0 1.5rem;
+    font-family: var(--font-mono);
+  }
+
+  .status-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: #2bb673;
+    box-shadow: 0 0 0 0 rgba(43, 182, 115, 0.5);
+    animation: pulse 2.4s var(--ease-in-out) infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(43, 182, 115, 0.5);
+    }
+    50% {
+      box-shadow: 0 0 0 6px rgba(43, 182, 115, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .status-dot {
+      animation: none;
+    }
+  }
+
+  .hero-title {
+    font-size: clamp(2.4rem, 6.4vw, 4.6rem);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 1.5rem;
+    max-width: 18ch;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--text);
+  }
+
+  .hero-line {
+    color: var(--text-muted);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 0.78em;
+    letter-spacing: -0.01em;
+  }
+
+  .hero-lede {
+    font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+    line-height: 1.55;
+    color: var(--text-muted);
+    max-width: 38em;
+    margin: 0 0 2rem;
+  }
+
+  .cta-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-bottom: 3rem;
+  }
+
+  .hero-strip {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 1.1rem 0;
+  }
+
+  @media (min-width: 720px) {
+    .hero-strip {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .strip-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0.25rem 1.2rem 0.25rem 0;
+    border-left: 1px solid var(--hairline);
+    padding-left: 1.2rem;
+  }
+
+  .strip-cell:first-child {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  @media (max-width: 720px) {
+    .strip-cell {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+
+  .strip-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-soft);
+    font-weight: 600;
+  }
+
+  .strip-value {
+    font-size: 0.95rem;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .strip-value a {
+    color: var(--text);
+    border-bottom: 1px solid var(--border-strong);
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .strip-value a:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+      text-decoration: none;
+    }
+  }
+
+  /* ---------- SPECIALTY GRID ---------- */
+
+  .specialty-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border-top: 1px solid var(--border);
+    border-left: 1px solid var(--border);
+  }
+
+  @media (min-width: 640px) {
+    .specialty-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 980px) {
+    .specialty-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .specialty {
+    padding: 1.6rem 1.4rem 1.5rem;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg-elevated) 35%, transparent);
+    transition:
+      background var(--dur) var(--ease-out),
+      transform var(--dur) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .specialty:hover {
+      background: var(--bg-elevated);
+      transform: translateY(-2px);
+    }
+  }
+
+  .specialty-symbol {
+    display: inline-block;
+    font-size: 0.72rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+  }
+
+  .specialty h3 {
+    font-size: 1.02rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.012em;
+  }
+
+  .specialty p {
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  /* ---------- FEATURE CARD ---------- */
+
+  .feature-card {
+    display: block;
+    padding: clamp(1.6rem, 3vw, 2.4rem);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    color: var(--text);
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition:
+      transform var(--dur) var(--ease-out),
+      border-color var(--dur) var(--ease-out),
+      box-shadow var(--dur) var(--ease-out);
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 240px;
+    height: 240px;
+    background: radial-gradient(circle at 100% 0%, var(--accent-soft) 0%, transparent 60%);
+    pointer-events: none;
+    transition: opacity var(--dur-slow) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .feature-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-lg);
+      text-decoration: none;
+    }
+    .feature-card:hover::before {
+      opacity: 1.4;
+    }
+  }
+
+  .feature-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.2em 0.7em;
+    border-radius: 999px;
+    background: var(--text);
+    color: var(--text-on-inverse);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    line-height: 1.6;
+  }
+
+  .feature-date {
+    font-size: 0.78rem;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .feature-title {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    margin: 0 0 0.6rem;
+    font-weight: 550;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+
+  .feature-company {
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .feature-summary {
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+    margin: 0 0 1.6rem;
+    max-width: 36em;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+    margin: 0 0 1.6rem;
+    padding: 1.2rem 0;
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  @media (min-width: 720px) {
+    .feature-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem 2.5rem;
+    }
+  }
+
+  .feature-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-soft);
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+  }
+
+  .feature-grid p {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin: 0;
+    color: var(--text);
+  }
+
+  .feature-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .feature-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .feature-tags .tag {
+    margin: 0;
+  }
+
+  .feature-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--accent);
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: gap var(--dur) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .feature-card:hover .feature-cta {
+      gap: 0.65rem;
+    }
+  }
+
+  /* ---------- PROJECT STRIP ---------- */
+
+  .project-strip {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 720px) {
+    .project-strip {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .project-strip-card {
+    display: block;
+    padding: 1.3rem 1.4rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    text-decoration: none;
+    position: relative;
+    transition:
+      transform var(--dur) var(--ease-out),
+      border-color var(--dur) var(--ease-out),
+      box-shadow var(--dur) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .project-strip-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-md);
+      text-decoration: none;
+    }
+  }
+
+  .project-strip-meta {
+    display: block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-soft);
+    margin-bottom: 0.5rem;
+  }
+
+  .project-strip-card h4 {
+    margin: 0 0 0.4rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.012em;
+  }
+
+  .project-strip-company {
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .project-strip-card p {
+    font-size: 0.92rem;
+    line-height: 1.5;
+    margin: 0 0 0.4rem;
+  }
+
+  .project-strip-arrow {
+    position: absolute;
+    top: 1.3rem;
+    right: 1.3rem;
+    color: var(--text-soft);
+    font-size: 1.1rem;
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      transform var(--dur) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .project-strip-card:hover .project-strip-arrow {
+      color: var(--accent);
+      transform: translateX(3px);
+    }
+  }
+
+  /* ---------- CONNECT ---------- */
+
+  .connect-card {
+    padding: clamp(2rem, 4vw, 3rem);
+    background: var(--bg-inverse);
+    color: var(--text-on-inverse);
+    border-radius: var(--radius-xl);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .connect-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 60%;
+    height: 200%;
+    background: radial-gradient(circle at center, var(--accent-soft) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .connect-card .kicker {
+    color: color-mix(in srgb, var(--text-on-inverse) 60%, transparent);
+    margin-bottom: 1rem;
+  }
+
+  .connect-card h2 {
+    color: var(--text-on-inverse);
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+    margin: 0 0 0.8rem;
+    line-height: 1.1;
+    max-width: 18ch;
+  }
+
+  .connect-card p.muted {
+    color: color-mix(in srgb, var(--text-on-inverse) 70%, transparent);
+    max-width: 36em;
+    margin: 0 0 1.8rem;
+    font-size: 1.02rem;
+  }
+
+  .connect-card .btn.primary {
+    --btn-bg: var(--text-on-inverse);
+    --btn-fg: var(--bg-inverse);
+    --btn-border: var(--text-on-inverse);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .connect-card .btn.primary:hover {
+      --btn-bg: var(--accent);
+      --btn-fg: var(--text-on-accent);
+      --btn-border: var(--accent);
+    }
+  }
+
+  .connect-card .btn.ghost {
+    color: var(--text-on-inverse);
+    border-color: color-mix(in srgb, var(--text-on-inverse) 25%, transparent);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .connect-card .btn.ghost:hover {
+      color: var(--text-on-inverse);
+      background: color-mix(in srgb, var(--text-on-inverse) 8%, transparent);
+      border-color: color-mix(in srgb, var(--text-on-inverse) 40%, transparent);
+    }
+  }
+</style>

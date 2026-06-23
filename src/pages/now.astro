@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../consts';
+import { t } from '../i18n';
+
+const locale = 'en' as const;
+const strings = t(locale).now;
+const description = strings.description.replace('{name}', SITE.author);
+---
+
+<BaseLayout title={strings.title} description={description} locale={locale}>
+  <article class="prose" data-reveal>
+    <header class="page-header">
+      <p class="kicker mono">Now</p>
+      <h1 class="serif">{strings.h1}</h1>
+      <p class="lede" set:html={strings.lede}></p>
+      <p class="updated muted mono">
+        {strings.lastUpdatedPrefix} <time datetime="2026-06-01">June 1, 2026</time>
+      </p>
+    </header>
+
+    <h2>{strings.h2a}</h2>
+    <ul>
+      {strings.learning.map((item) => <li>{item}</li>)}
+    </ul>
+
+    <h2>{strings.h2b}</h2>
+    <ul>
+      {strings.building.map((item) => <li>{item}</li>)}
+    </ul>
+
+    <h2>{strings.h2c}</h2>
+    <ul>
+      {strings.researching.map((item) => <li>{item}</li>)}
+    </ul>
+  </article>
+</BaseLayout>
+
+<style>
+  .updated {
+    font-size: 0.85rem;
+    margin-top: 1rem;
+    color: var(--text-soft);
+  }
+</style>

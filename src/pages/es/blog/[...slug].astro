@@ -1,0 +1,61 @@
+---
+import { getCollection, render } from 'astro:content';
+import BlogPostLayout from '../../../layouts/BlogPostLayout.astro';
+import { otherLocale, localizePath } from '../../../i18n';
+
+export async function getStaticPaths() {
+  // Only Spanish posts are routed here. Their IDs are namespaced as `es/...`
+  // by virtue of living in src/content/blog/es/; strip the `es/` prefix when
+  // building the URL slug so the canonical URL is /es/blog/<slug>/.
+  const posts = await getCollection('blog', ({ data }) => !data.draft && data.lang === 'es');
+  return posts.map((post) => ({
+    params: { slug: post.id.replace(/^es\//, '') },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+// Compute the URL of the counterpart post in the OTHER language (English).
+// If the post has a translationKey and the matching English post exists,
+// link to it; otherwise fall back to the English /blog/ index.
+const other = otherLocale('es');
+let alternateUrl = localizePath('/blog/', other);
+if (post.data.translationKey) {
+  const matches = await getCollection('blog', ({ data }) =>
+    !data.draft && data.translationKey === post.data.translationKey && data.lang === other,
+  );
+  if (matches[0]) {
+    alternateUrl = `${localizePath('/blog/', other)}${matches[0].id}/`;
+  }
+}
+---
+
+<BlogPostLayout post={post} locale="es" alternateUrl={alternateUrl}>
+  <Content />
+  <hr />
+  <p class="back-bottom">
+    <a href="/es/blog/">&larr; Volver a todas las entradas</a>
+  </p>
+</BlogPostLayout>
+
+<style>
+  .back-bottom {
+    margin-top: 2.5rem;
+    font-size: 0.95rem;
+  }
+
+  .back-bottom a {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    color: var(--text-muted);
+  }
+
+  .back-bottom a:hover {
+    background: var(--bg-elevated);
+    color: var(--accent);
+    text-decoration: none;
+  }
+</style>

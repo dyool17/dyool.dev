@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { t, formatDate } from '../../i18n';
+
+const locale = 'en' as const;
+const strings = t(locale).blog;
+
+const posts = (
+  await getCollection('blog', ({ data }) => !data.draft && data.lang === locale)
+).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const allTags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
+---
+
+<BaseLayout title={strings.title} description={strings.description} locale={locale}>
+  <header class="page-header" data-reveal>
+    <p class="kicker mono">Blog</p>
+    <h1 class="serif">{strings.h1}</h1>
+    <p class="lede" set:html={strings.lede}></p>
+  </header>
+
+  {
+    allTags.length > 0 && (
+      <p class="tag-row" aria-label={strings.tagsLabel} data-reveal>
+        {allTags.map((tag) => (
+          <span class="tag">#{tag}</span>
+        ))}
+      </p>
+    )
+  }
+
+  {
+    posts.length === 0 ? (
+      <p class="muted">{strings.noPosts}</p>
+    ) : (
+      <ul class="post-list post-list--flush post-list--with-tags" data-reveal>
+        {posts.map((post) => (
+          <li>
+            <a class="post-link" href={`/blog/${post.id}/`}>
+              <span class="post-title">{post.data.title}</span>
+              <time class="post-date" datetime={post.data.pubDate.toISOString()}>
+                {formatDate(post.data.pubDate, locale)}
+              </time>
+              <span class="post-desc">{post.data.description}</span>
+              {post.data.tags.length > 0 && (
+                <span class="post-tags">
+                  {post.data.tags.map((t) => (
+                    <span class="tag">#{t}</span>
+                  ))}
+                </span>
+              )}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0 0 2rem;
+  }
+</style>

@@ -1,0 +1,109 @@
+---
+import { SITE } from '../consts';
+import { LOCALE_META, getAlternateLinks, getLocaleFromPath, otherLocale, localizePath } from '../i18n';
+
+const {
+  title,
+  description = SITE.description,
+  image,
+  type = 'website',
+  pubDate,
+  updatedDate,
+  tags = [],
+  canonicalPath,
+  jsonLd,
+  // Page-level locale. Defaults to the locale derived from the current URL.
+  locale: localeProp,
+  // Optional explicit URL for the page in the other language. Used by the
+  // language switch so hreflang is correct even when the page is a blog post
+  // that links to its translated counterpart.
+  alternateUrl,
+} = Astro.props as {
+  title: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article' | 'profile';
+  pubDate?: Date;
+  updatedDate?: Date;
+  tags?: string[];
+  canonicalPath?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  locale?: 'en' | 'es';
+  alternateUrl?: string;
+};
+
+const locale = localeProp ?? getLocaleFromPath(Astro.url.pathname);
+const meta = LOCALE_META[locale];
+
+const canonical = new URL(canonicalPath ?? Astro.url.pathname, Astro.site ?? SITE.url).toString();
+const ogImage = new URL(image ?? '/og-default.png', Astro.site ?? SITE.url).toString();
+const siteName = SITE.title;
+
+// hreflang alternates. Build the standard set, then override the "other"
+// locale with the explicit alternate URL when the caller provided one (so
+// blog posts can point at their translated counterpart, not a 404).
+const baseAlternates = getAlternateLinks(Astro.url.pathname).map((alt) => ({
+  hreflang: alt.hreflang,
+  href: new URL(alt.href, Astro.site ?? SITE.url).toString(),
+}));
+const other = otherLocale(locale);
+const alternates = alternateUrl
+  ? baseAlternates.map((alt) =>
+      alt.hreflang === LOCALE_META[other].htmlLang
+        ? { hreflang: alt.hreflang, href: new URL(alternateUrl, Astro.site ?? SITE.url).toString() }
+        : alt,
+    )
+  : baseAlternates;
+
+// x-default falls back to the canonical (English) URL.
+const xDefault = baseAlternates.find((a) => a.hreflang === 'en')?.href ?? canonical;
+
+// RSS link is locale-aware: /rss.xml for English, /es/rss.xml for Spanish.
+const rssHref = localizePath('/rss.xml', locale);
+---
+
+<title>{title} — {siteName}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+
+<!--
+  Locale + hreflang. Always emit every supported locale so search engines can
+  pair the pages correctly. `x-default` points at the canonical (English)
+  version, which is the convention for sites that target multiple languages.
+-->
+<meta http-equiv="content-language" content={meta.htmlLang} />
+{
+  alternates.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)
+}
+<link rel="alternate" hreflang="x-default" href={xDefault} />
+<link rel="alternate" type="application/rss+xml" title={`${siteName} — Blog`} href={rssHref} />
+
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:locale" content={meta.og} />
+{
+  pubDate && <meta property="article:published_time" content={pubDate.toISOString()} />
+}
+{
+  updatedDate && <meta property="article:modified_time" content={updatedDate.toISOString()} />
+}
+{tags.map((tag) => <meta property="article:tag" content={tag} />)}
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+{
+  jsonLd && (
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(Array.isArray(jsonLd) ? jsonLd : [jsonLd])}
+    />
+  )
+}

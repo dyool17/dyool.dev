@@ -1,0 +1,153 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { t, formatLongDate, getLocaleFromPath, localizePath, type Locale } from '../i18n';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+  locale?: Locale;
+  // URL of the page in the OTHER language. The page route resolves this by
+  // looking up the post's `translationKey` and finding the matching entry in
+  // the other locale. When no translation exists, pass the localized
+  // `/blog/` (or `/`) so the hreflang is still a valid, useful link.
+  alternateUrl?: string;
+}
+
+const { post, locale: localeProp, alternateUrl } = Astro.props as Props;
+const locale = localeProp ?? getLocaleFromPath(Astro.url.pathname);
+const strings = t(locale).post;
+const { title, description, pubDate, updatedDate, tags } = post.data;
+
+const formattedPub = formatLongDate(pubDate, locale);
+const formattedUpd = updatedDate ? formatLongDate(updatedDate, locale) : undefined;
+
+const backHref = localizePath('/blog/', locale);
+const backLabel =
+  locale === 'es' ? 'Volver a todas las entradas' : 'Back to all posts';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: pubDate.toISOString(),
+  dateModified: (updatedDate ?? pubDate).toISOString(),
+  keywords: tags.join(', '),
+  mainEntityOfPage: new URL(Astro.url.pathname, Astro.site).toString(),
+  author: { '@type': 'Person', name: 'Dylan Yool' },
+  inLanguage: locale,
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  pubDate={pubDate}
+  updatedDate={updatedDate}
+  tags={tags}
+  canonicalPath={Astro.url.pathname}
+  jsonLd={jsonLd}
+  locale={locale}
+  alternateUrl={alternateUrl}
+>
+  <article class="prose" data-reveal>
+    <p class="back">
+      <a href={backHref}>
+        <span aria-hidden="true">←</span> {backLabel}
+      </a>
+    </p>
+
+    <header class="post-header">
+      <p class="meta mono">
+        <time datetime={pubDate.toISOString()}>{formattedPub}</time>
+        {
+          updatedDate && formattedUpd && (
+            <>
+              <span aria-hidden="true"> · </span>
+              <span>
+                {strings.updatedLabel} <time datetime={updatedDate.toISOString()}>{formattedUpd}</time>
+              </span>
+            </>
+          )
+        }
+      </p>
+      <h1>{title}</h1>
+      {description && <p class="lede">{description}</p>}
+      {
+        tags.length > 0 && (
+          <p class="tag-list" aria-label={strings.tagsLabel}>
+            {tags.map((t) => (
+              <span class="tag">#{t}</span>
+            ))}
+          </p>
+        )
+      }
+    </header>
+
+    <slot />
+  </article>
+</BaseLayout>
+
+<style>
+  .back {
+    margin: 0 0 2rem;
+    font-size: 0.9rem;
+  }
+
+  .back a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text-muted);
+    padding: 0.2rem 0;
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      gap var(--dur) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .back a:hover {
+      color: var(--accent);
+      text-decoration: none;
+      gap: 0.55rem;
+    }
+  }
+
+  .post-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .post-header h1 {
+    margin: 0.4rem 0 0.6rem;
+  }
+
+  .post-header .lede {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+    margin: 0 0 1.25rem;
+    max-width: 38em;
+  }
+
+  .meta {
+    color: var(--text-soft);
+    font-size: 0.82rem;
+    margin: 0 0 0.4rem;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+  }
+
+  .tag-list {
+    margin: 1.25rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .tag-list .tag {
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,143 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SEO from '../components/SEO.astro';
+import { SITE } from '../consts';
+import { LOCALE_META, getLocaleFromPath, type Locale, t } from '../i18n';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article' | 'profile';
+  pubDate?: Date;
+  updatedDate?: Date;
+  tags?: string[];
+  canonicalPath?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  // Locale for this page. When omitted, derived from the current URL.
+  locale?: Locale;
+  // Explicit URL of the page in the other language. Used to set the
+  // `hreflang` for the other locale (so blog posts link to their translated
+  // counterpart, not a 404).
+  alternateUrl?: string;
+}
+
+const {
+  title,
+  description,
+  image,
+  type,
+  pubDate,
+  updatedDate,
+  tags,
+  canonicalPath,
+  jsonLd,
+  locale: localeProp,
+  alternateUrl,
+} = Astro.props as Props;
+
+const locale = localeProp ?? getLocaleFromPath(Astro.url.pathname);
+const meta = LOCALE_META[locale];
+
+// Default site-wide JSON-LD: WebSite + Person. The Person name uses the
+// localized strings where appropriate; the rest is language-neutral.
+const siteJsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE.title,
+    url: SITE.url,
+    description: SITE.description,
+    inLanguage: meta.htmlLang,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: SITE.author,
+    url: SITE.url,
+    jobTitle: SITE.jobTitle,
+    knowsAbout: [...SITE.knowsAbout],
+    sameAs: [SITE.linkedin].filter(Boolean),
+  },
+];
+
+// Stash the alternate URL on the root <html> element. The language toggle
+// reads this and uses it as the destination when switching, instead of
+// recomputing from the current path (which would 404 on translated blog
+// posts whose counterpart lives at a different slug).
+const altForOther = alternateUrl ?? null;
+---
+
+<!doctype html>
+<html lang={meta.htmlLang} data-locale={locale} data-alt-url={altForOther ?? undefined}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0c10" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap.xml" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    />
+
+    <SEO
+      title={title}
+      description={description}
+      image={image}
+      type={type}
+      pubDate={pubDate}
+      updatedDate={updatedDate}
+      tags={tags}
+      canonicalPath={canonicalPath}
+      jsonLd={[...siteJsonLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])]}
+      locale={locale}
+      alternateUrl={altForOther ?? undefined}
+    />
+  </head>
+  <body>
+    <a href="#main" class="skip-link">{t(locale).skip}</a>
+    <Header alternateUrl={alternateUrl ?? null} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer locale={locale} />
+
+    <script>
+      // Soft reveal-on-scroll. Single observer, no per-element listener.
+      // Progressive-enhancement safe: the hidden pre-reveal state only
+      // applies after we add `reveal-ready` to <body>. Reduced-motion users
+      // and environments without IntersectionObserver skip the animation
+      // entirely and just mark every target as shown.
+      (() => {
+        const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const targets = document.querySelectorAll('[data-reveal]');
+        if (reduce || !('IntersectionObserver' in window) || targets.length === 0) {
+          targets.forEach((el) => el.setAttribute('data-reveal', 'shown'));
+          return;
+        }
+        // Opt-in to the hidden pre-reveal state only now that JS runs.
+        document.body.classList.add('reveal-ready');
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.setAttribute('data-reveal', 'shown');
+                io.unobserve(entry.target);
+              }
+            }
+          },
+          { rootMargin: '0px 0px -8% 0px', threshold: 0.05 },
+        );
+        targets.forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>

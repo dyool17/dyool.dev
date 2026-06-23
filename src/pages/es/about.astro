@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SITE } from '../../consts';
+import { t, getLocaleFromPath } from '../../i18n';
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+const strings = t(locale).about;
+
+const title = strings.title;
+const description = strings.description.replace('{name}', SITE.author);
+const lede = strings.lede.replace('{name}', SITE.author);
+const p4 = strings.p4.replace('{linkedin}', SITE.linkedin);
+---
+
+<BaseLayout title={title} description={description} locale={locale}>
+  <article class="prose" data-reveal>
+    <header class="page-header">
+      <p class="kicker mono">Sobre mí</p>
+      <h1 class="serif">{strings.h1}</h1>
+      <p class="lede" set:html={lede}></p>
+    </header>
+
+    <h2>{strings.h2a}</h2>
+    <p>{strings.p2}</p>
+
+    <h2>{strings.h2b}</h2>
+    <ul>
+      {strings.interests.map((item) => <li set:html={item}></li>)}
+    </ul>
+
+    <h2>{strings.h2c}</h2>
+    <p set:html={strings.p3}></p>
+
+    <h2>{strings.h2d}</h2>
+    <p set:html={p4}></p>
+  </article>
+</BaseLayout>
