@@ -6,6 +6,7 @@ updatedDate: 2026-06-20
 tags: ['meta', 'escritura', 'backend']
 lang: 'es'
 translationKey: 'owning-your-corner-of-the-web'
+category: 'Web'
 ---
 
 # Introducción

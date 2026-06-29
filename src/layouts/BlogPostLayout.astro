@@ -16,14 +16,18 @@ interface Props {
 const { post, locale: localeProp, alternateUrl } = Astro.props as Props;
 const locale = localeProp ?? getLocaleFromPath(Astro.url.pathname);
 const strings = t(locale).post;
-const { title, description, pubDate, updatedDate, tags } = post.data;
+const { title, description, pubDate, updatedDate, tags, category } = post.data;
 
 const formattedPub = formatLongDate(pubDate, locale);
 const formattedUpd = updatedDate ? formatLongDate(updatedDate, locale) : undefined;
 
 const backHref = localizePath('/blog/', locale);
-const backLabel =
-  locale === 'es' ? 'Volver a todas las entradas' : 'Back to all posts';
+const backLabel = locale === 'es' ? 'Volver a todas las entradas' : 'Back to all posts';
+
+// Tag and category routes are locale-aware.
+const tagHref = (tag: string) => `${localizePath('/blog/tags/', locale)}${tag}/`;
+const categoryHref = (cat: string) =>
+  `${localizePath('/blog/categories/', locale)}${cat.toLowerCase().replace(/\s+/g, '-')}/`;
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -51,42 +55,58 @@ const jsonLd = {
   locale={locale}
   alternateUrl={alternateUrl}
 >
-  <article class="prose" data-reveal>
-    <p class="back">
-      <a href={backHref}>
-        <span aria-hidden="true">←</span> {backLabel}
-      </a>
-    </p>
+  <div data-pagefind-body>
+    <article class="prose" data-reveal>
+      <p class="back">
+        <a href={backHref}>
+          <span aria-hidden="true">←</span>
+          {backLabel}
+        </a>
+      </p>
 
-    <header class="post-header">
-      <p class="meta mono">
-        <time datetime={pubDate.toISOString()}>{formattedPub}</time>
+      <header class="post-header">
+        <p class="meta mono">
+          <time datetime={pubDate.toISOString()}>{formattedPub}</time>
+          {
+            updatedDate && formattedUpd && (
+              <>
+                <span aria-hidden="true"> · </span>
+                <span>
+                  {strings.updatedLabel}{' '}
+                  <time datetime={updatedDate.toISOString()}>{formattedUpd}</time>
+                </span>
+              </>
+            )
+          }
+          {
+            category && (
+              <>
+                <span aria-hidden="true"> · </span>
+                <a class="meta-category" href={categoryHref(category)}>
+                  {category}
+                </a>
+              </>
+            )
+          }
+        </p>
+        <h1>{title}</h1>
+        {description && <p class="lede">{description}</p>}
         {
-          updatedDate && formattedUpd && (
-            <>
-              <span aria-hidden="true"> · </span>
-              <span>
-                {strings.updatedLabel} <time datetime={updatedDate.toISOString()}>{formattedUpd}</time>
-              </span>
-            </>
+          tags.length > 0 && (
+            <p class="tag-list" aria-label={strings.tagsLabel}>
+              {tags.map((tag) => (
+                <a class="tag tag--link" href={tagHref(tag)}>
+                  #{tag}
+                </a>
+              ))}
+            </p>
           )
         }
-      </p>
-      <h1>{title}</h1>
-      {description && <p class="lede">{description}</p>}
-      {
-        tags.length > 0 && (
-          <p class="tag-list" aria-label={strings.tagsLabel}>
-            {tags.map((t) => (
-              <span class="tag">#{t}</span>
-            ))}
-          </p>
-        )
-      }
-    </header>
+      </header>
 
-    <slot />
-  </article>
+      <slot />
+    </article>
+  </div>
 </BaseLayout>
 
 <style>
@@ -149,5 +169,38 @@ const jsonLd = {
 
   .tag-list .tag {
     margin: 0;
+  }
+
+  /* When a tag pill becomes a link it must look interactive but never feel
+     like a heavy button. We only nudge the affordance — color shift, no fill
+     change — so the editorial flatness of the post header is preserved. */
+  .tag-list .tag--link {
+    text-decoration: none;
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out),
+      background var(--dur-fast) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .tag-list .tag--link:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      text-decoration: none;
+    }
+  }
+
+  .meta-category {
+    color: var(--text-soft);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .meta-category:hover {
+      color: var(--accent);
+      text-decoration: none;
+    }
   }
 </style>

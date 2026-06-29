@@ -16,6 +16,14 @@ const blog = defineCollection({
     // Posts with the same `translationKey` are treated as translations of one
     // another. The language switch uses this to find the counterpart.
     translationKey: z.string().optional(),
+    // Discovery metadata — used for category pages, featured posts, series
+    // grouping, and future schema.org/SEO enrichment. All optional with
+    // sensible defaults so existing posts keep validating.
+    category: z.string().default('General'),
+    featured: z.boolean().default(false),
+    series: z.string().optional(),
+    canonicalUrl: z.string().url().optional(),
+    readingTime: z.number().optional(),
   }),
 });
 
@@ -25,4 +33,3 @@ const blog = defineCollection({
 // this collection anymore.
 
 export const collections = { blog };
-

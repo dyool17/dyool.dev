@@ -1,0 +1,184 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { t, formatDate } from '../../../../i18n';
+
+export async function getStaticPaths() {
+  // Inlined so the closure has access at build time. Must match the one
+  // used in the template below so emitted hrefs resolve to the same URLs.
+  const slugifyCategory = (cat: string) => cat.toLowerCase().replace(/\s+/g, '-');
+
+  const posts = await getCollection('blog', ({ data }) => !data.draft && data.lang === 'es');
+
+  const byCategory = new Map<string, typeof posts>();
+  for (const post of posts) {
+    const cat = post.data.category;
+    const list = byCategory.get(cat) ?? [];
+    list.push(post);
+    byCategory.set(cat, list);
+  }
+
+  return [...byCategory.entries()].map(([category, catPosts]) => {
+    const sorted = catPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+    return {
+      params: { category: slugifyCategory(category) },
+      props: { posts: sorted, category },
+    };
+  });
+}
+
+const { posts, category } = Astro.props;
+const locale = 'es' as const;
+const strings = t(locale).blog;
+
+const slugifyCategory = (cat: string) => cat.toLowerCase().replace(/\s+/g, '-');
+
+const postHref = (id: string) => `/es/blog/${id.replace(/^es\//, '')}/`;
+const tagHref = (tag: string) => `/es/blog/tags/${tag}/`;
+const categoryHref = (cat: string) => `/es/blog/categories/${slugifyCategory(cat)}/`;
+
+const allTags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
+const allCategories = [...new Set(posts.map((p) => p.data.category))].sort();
+---
+
+<BaseLayout
+  title={`${category} — ${strings.title}`}
+  description={strings.description}
+  locale={locale}
+>
+  <header class="page-header" data-reveal>
+    <p class="kicker mono">{strings.categoriesLabel}</p>
+    <h1 class="serif">{category}</h1>
+    <p class="lede">
+      {posts.length === 1 ? '1 entrada' : `${posts.length} entradas`} en <code>{category}</code>.
+    </p>
+  </header>
+
+  <p class="back-link" data-reveal>
+    <a href="/es/blog/"><span aria-hidden="true">←</span> {strings.backToAll}</a>
+  </p>
+
+  {
+    (allTags.length > 0 || allCategories.length > 0) && (
+      <div class="discover" data-reveal>
+        {allCategories.length > 0 && (
+          <p class="tag-row" aria-label={strings.categoriesLabel}>
+            {allCategories.map((cat) => (
+              <a
+                class={`tag tag--link tag--category${cat === category ? ' tag--active' : ''}`}
+                href={categoryHref(cat)}
+              >
+                {cat}
+              </a>
+            ))}
+          </p>
+        )}
+        {allTags.length > 0 && (
+          <p class="tag-row" aria-label={strings.tagsLabel}>
+            {allTags.map((t) => (
+              <a class="tag tag--link" href={tagHref(t)}>
+                #{t}
+              </a>
+            ))}
+          </p>
+        )}
+      </div>
+    )
+  }
+
+  {
+    posts.length === 0 ? (
+      <p class="muted">{strings.noPosts}</p>
+    ) : (
+      <ul class="post-list post-list--flush post-list--with-tags" data-reveal>
+        {posts.map((post) => (
+          <li>
+            <a class="post-link" href={postHref(post.id)}>
+              <span class="post-title">{post.data.title}</span>
+              <time class="post-date" datetime={post.data.pubDate.toISOString()}>
+                {formatDate(post.data.pubDate, locale)}
+              </time>
+              <span class="post-desc">{post.data.description}</span>
+              {post.data.tags.length > 0 && (
+                <span class="post-tags">
+                  {post.data.tags.map((t) => (
+                    <a class="tag tag--link" href={tagHref(t)}>
+                      #{t}
+                    </a>
+                  ))}
+                </span>
+              )}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .back-link {
+    margin: 0 0 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .back-link a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      gap var(--dur) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .back-link a:hover {
+      color: var(--accent);
+      text-decoration: none;
+      gap: 0.55rem;
+    }
+  }
+
+  .discover {
+    margin: 0 0 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin: 0;
+  }
+
+  .tag--link {
+    text-decoration: none;
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out),
+      background var(--dur-fast) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .tag--link:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      text-decoration: none;
+    }
+  }
+
+  .tag--active {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .tag--category {
+    text-transform: capitalize;
+  }
+</style>
