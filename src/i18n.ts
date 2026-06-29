@@ -21,7 +21,6 @@ export interface LocaleMeta {
   htmlLang: string;
   og: string;
   dateLocale: string;
-  rssLang: string;
 }
 
 export const LOCALE_META: Record<Locale, LocaleMeta> = {
@@ -31,7 +30,6 @@ export const LOCALE_META: Record<Locale, LocaleMeta> = {
     htmlLang: 'en',
     og: 'en_US',
     dateLocale: 'en-US',
-    rssLang: 'en-us',
   },
   es: {
     label: 'Español',
@@ -39,7 +37,6 @@ export const LOCALE_META: Record<Locale, LocaleMeta> = {
     htmlLang: 'es',
     og: 'es_ES',
     dateLocale: 'es-ES',
-    rssLang: 'es-es',
   },
 };
 
@@ -128,7 +125,6 @@ type UITranslations = {
     lede: string;
     backToAll: string;
     noPosts: string;
-    rssCta: string;
     tagsLabel: string;
     sortNewest: string;
     sortUpdated: string;
@@ -280,10 +276,9 @@ export const ui: Record<Locale, UITranslations> = {
       description:
         'Engineering writing on backend systems, microservices, and the work of leading a small team.',
       h1: 'Notes on what I build, what breaks, and what I learn.',
-      lede: 'Engineering writing on backend systems, microservices, and the work of leading a small team. Subscribe via <a href="/rss.xml">RSS</a>.',
+      lede: 'Engineering writing on backend systems, microservices, and the work of leading a small team.',
       backToAll: 'Back to all posts',
       noPosts: 'No posts published yet.',
-      rssCta: 'RSS',
       tagsLabel: 'Tags',
       sortNewest: 'Newest',
       sortUpdated: 'Recently updated',
@@ -453,10 +448,9 @@ export const ui: Record<Locale, UITranslations> = {
       description:
         'Escritura de ingeniería sobre sistemas backend, microservicios y el trabajo de liderar un equipo pequeño.',
       h1: 'Notas sobre lo que construyo, lo que se rompe y lo que aprendo.',
-      lede: 'Escritura de ingeniería sobre sistemas backend, microservicios y el trabajo de liderar un equipo pequeño. Suscribirme via <a href="/es/rss.xml">RSS</a>.',
+      lede: 'Escritura de ingeniería sobre sistemas backend, microservicios y el trabajo de liderar un equipo pequeño.',
       backToAll: 'Volver a todas las entradas',
       noPosts: 'Aún no hay entradas publicadas.',
-      rssCta: 'RSS',
       tagsLabel: 'Etiquetas',
       sortNewest: 'Más recientes',
       sortUpdated: 'Actualizados recentemente',

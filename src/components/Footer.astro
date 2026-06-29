@@ -1,6 +1,6 @@
 ---
 import { SITE, SOCIAL } from '../consts';
-import { t, localizePath, type Locale } from '../i18n';
+import { t, type Locale } from '../i18n';
 
 interface Props {
   locale?: Locale;
@@ -11,19 +11,13 @@ const strings = t(locale);
 const year = new Date().getFullYear();
 
 // Map social label to a tiny inline icon. Falls back to no icon for
-// anything not in the lookup (e.g. RSS).
+// anything not in the lookup.
 const ICONS: Record<string, string> = {
   LinkedIn:
     '<path fill="currentColor" d="M20.4 2H3.6C2.7 2 2 2.7 2 3.6v16.8c0 .9.7 1.6 1.6 1.6h16.8c.9 0 1.6-.7 1.6-1.6V3.6C22 2.7 21.3 2 20.4 2zM8.3 18.3H5.3V9.7h3v8.6zM6.8 8.4c-1 0-1.8-.8-1.8-1.8s.8-1.7 1.8-1.7 1.8.8 1.8 1.8-.8 1.7-1.8 1.7zm11.5 9.9h-3v-4.2c0-1 0-2.3-1.4-2.3-1.4 0-1.6 1.1-1.6 2.2v4.3h-3V9.7h2.9v1.2c.4-.8 1.4-1.6 2.9-1.6 3.1 0 3.7 2 3.7 4.7v4.3z"/>',
-  RSS: '<path fill="currentColor" d="M4 4v3a13 13 0 0 1 13 13h3A16 16 0 0 0 4 4zm0 6v3a7 7 0 0 1 7 7h3a10 10 0 0 0-10-10zm2 7a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>',
 };
 
-const socials = SOCIAL.map((s) => {
-  if (s.label !== 'RSS') return s;
-  // RSS link is locale-aware so the feed matches the language the user is
-  // currently reading.
-  return { ...s, href: localizePath('/rss.xml', locale) };
-});
+const socials = SOCIAL;
 
 const socialsLabel = locale === 'es' ? 'Enlaces sociales' : 'Social links';
 ---

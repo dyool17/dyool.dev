@@ -43,5 +43,4 @@ export const NAV = [
 // project itself, not surfaced through this list.
 export const SOCIAL = [
   { href: SITE.linkedin, label: 'LinkedIn' },
-  { href: '/rss.xml', label: 'RSS' },
 ] as const;

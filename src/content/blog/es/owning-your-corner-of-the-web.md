@@ -1,8 +1,8 @@
 ---
 title: 'Por qué estoy construyendo mi propio rincón de la web'
-description: 'Tras años escribiendo en plataformas alquiladas, estoy consolidando mi sitio, CV y notas de ingeniería en un único sitio estático que poseo por completo.'
+description: 'Tras años deseando compartir aprendizajes y opiniones, estoy consolidando mi sitio, CV y notas de ingeniería en un único sitio estático que poseo por completo.'
 pubDate: 2026-06-15
-updatedDate: 2026-06-20
+updatedDate: 2026-06-29
 tags: ['meta', 'escritura', 'backend']
 lang: 'es'
 translationKey: 'owning-your-corner-of-the-web'
@@ -18,11 +18,7 @@ carpeta de archivos Markdown en tiempo de build.
 
 # Contexto
 
-Antes publicaba en plataformas que no controlaba. Cada una tenía reglas
-distintas, formatos distintos y formas distintas de desaparecer. Después de
-la tercera vez que una plataforma cambió de opinión, decidí que la cura era
-un sitio estático que pudiese copiar y pegar a cualquier hosting en menos de
-una hora.
+Todos tenemos algo que compartir, sin excepción. Así como yo, seguramente tú también, estimado lector, lo has pensado. Cada uno tiene sus razones por las cuales no lo ha hecho. En mi caso, siempre fue sentir que aún no sé lo suficiente como para aportar valor real. Cuando por fin superé esa sensación, me topé con que realmente no quería dedicar mucho tiempo a las redes sociales; realmente no son lo mío. Soy más de hacerlo simple, y esta fue la solución a la que llegué: un sitio estático simple y práctico que pudiese copiar y pegar a cualquier hosting en menos de una hora.
 
 El PRD que guía este sitio es corto y sin sentimentalismos: Astro en GitHub
 Pages, Markdown como único formato de contenido, nada de JavaScript en el
@@ -35,8 +31,7 @@ Las partes interesantes:
 - **Colecciones de contenido** con un esquema estricto. Cada post debe
   declarar un `pubDate`, una `description` de una línea y al menos un tag.
   Los borradores se filtran en build, nunca en runtime.
-- **RSS y sitemap** generados desde la misma colección. Una única fuente de
-  verdad, dos formatos de salida.
+- **Sitemap** generado desde la misma colección. Una única fuente de verdad.
 - **Tema claro y oscuro** a partir de custom properties de CSS. Un pequeño
   script inline aplica la elección del usuario antes del primer paint para
   evitar un flash del tema equivocado.

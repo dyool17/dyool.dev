@@ -15,7 +15,6 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@astrojs/rss": "^4.0.10",
     "@astrojs/sitemap": "^3.2.1",
     "astro": "^5.1.0",
     "pagefind": "^1.5.2"
